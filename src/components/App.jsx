@@ -1,57 +1,49 @@
-import { Component } from 'react';
 import appCss from './App.module.css';
 
 import { Section } from './Section/Section';
 import { FeedbackOptions } from './FeedbackOptions/FeedbackOptions';
 import { Statistics } from './Statistics/Statistics';
 import { Notification } from './Notification/Notification';
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
-
-  increment = state => {
-    this.setState(prevState => ({
-      [state]: prevState[state] + 1,
+import { useState } from 'react';
+export const App = () => {
+  const [feedbacks, setFeedbacks] = useState({ good: 0, neutral: 0, bad: 0 });
+  const { good, neutral, bad } = feedbacks;
+  const increment = value => {
+    setFeedbacks(prevfeedback => ({
+      ...prevfeedback,
+      [value]: prevfeedback[value] + 1,
     }));
   };
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
+  const countTotalFeedback = () => {
     return good + neutral + bad;
   };
 
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
-
-    return Math.round((good / this.countTotalFeedback()) * 100);
+  const countPositiveFeedbackPercentage = () => {
+    return Math.round((good / countTotalFeedback()) * 100);
   };
 
-  render() {
-    const options = Object.keys(this.state);
-    const { good, neutral, bad } = this.state;
-
-    return (
-      <div className={appCss.container}>
-        <Section title="Please leave feedback">
-          <FeedbackOptions options={options} increment={this.increment} />
-        </Section>
-        <Section title="Statistics">
-          {this.countTotalFeedback() > 0 ? (
-            <Statistics
-              good={good}
-              netural={neutral}
-              bad={bad}
-              total={this.countTotalFeedback()}
-              percentage={this.countPositiveFeedbackPercentage()}
-            />
-          ) : (
-            <Notification text="No feedback given" />
-          )}
-        </Section>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={appCss.container}>
+      <Section title="Please leave feedback">
+        <FeedbackOptions
+          options={Object.keys(feedbacks)}
+          increment={increment}
+        />
+      </Section>
+      <Section title="Statistics">
+        {countTotalFeedback() > 0 ? (
+          <Statistics
+            good={good}
+            netural={neutral}
+            bad={bad}
+            total={countTotalFeedback()}
+            percentage={countPositiveFeedbackPercentage()}
+          />
+        ) : (
+          <Notification text="No feedback given" />
+        )}
+      </Section>
+    </div>
+  );
+};
